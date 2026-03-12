@@ -9,6 +9,7 @@ import service.ClinicManager;
 import model.Patient;
 import model.Doctor;
 import model.Appointment;
+import utils.Validations;
 
 import java.util.Scanner;
 
@@ -55,49 +56,124 @@ public class ClinicManagement {
                 switch(option){
                     
                     case 1: 
-                        System.out.println("ID del paciente: ");
-                        String pId = scanner.nextLine();
-                        //Ensures the same ID does not exist twice
-                        if(manager.findPatientID(pId) != null){
-                            System.out.println("Error. ya existe este ID");
-                        } else{
-                            System.out.println("Nombre del paciente: ");
-                            String pName = scanner.nextLine();
-                        
-                            System.out.println("Edad: ");
-                            int pAge = scanner.nextInt();
-                            scanner.nextLine();
+                        String pId;
+                        while(true){
+                            System.out.println("ID del paciente: ");
+                            pId = scanner.nextLine();
                             
-                            //New variable: pGuardian, default value: N/A
-                            String pGuardian = "N/A";
-                            //If the patient is a minor, they must have a guardian for the appointment
-                            if(pAge < 18){
+                            if(manager.findPatientID(pId) != null){
+                            System.out.println("Error. ya existe este ID");
+                        }else if(!Validations.validId(pId)){ 
+                            System.out.println("El ID debe contener solo numeros");
+                         }else{
+                            break;
+                          } 
+                       }
+                        
+                        String pName;
+                        while(true){
+                            System.out.println("Nombre del paciente: ");
+                            pName = scanner.nextLine();
+                            
+                            if(!Validations.validName(pName)){
+                                System.out.println("Nombre invalido. Por favor, solo digite letras");
+                            } else {
+                                break;
+                            }
+                        }
+                        
+                        int pAge;
+
+                        while(true){
+
+                            System.out.println("Edad: ");
+                            String inputAge = scanner.nextLine();
+
+                            try{
+                                pAge = Integer.parseInt(inputAge);
+
+                                if(!Validations.validAge(pAge)){
+                                    System.out.println("Edad invalida");
+                                }else{
+                                    break;
+                                }
+
+                            }catch(NumberFormatException e){
+                                System.out.println("Debe ingresar un numero");
+                            }
+                        }
+                            
+                            
+                        //New variable: pGuardian, default value: N/A
+                        String pGuardian = "N/A";
+                        if(pAge < 18) {
+                            while(true){
+                                //If the patient is a minor, they must have a guardian for the appointment
                                 System.out.println("Menor de edad. Digite el nombre del acudiente: ");
-                                pGuardian = scanner.nextLine();
-                            } 
+                                pGuardian = scanner.nextLine();                                
+                            
+                                if(!Validations.validName(pGuardian)){
+                                    System.out.println("Nombre invalido. Solo digite letras");
+                                }else{
+                                    break;
+                               }
+                            }
+                        }
+                            
                             //The registered patient is stored in these data
                             Patient patient = new Patient(pId, pName, pAge, pGuardian);
                             //Saves the patient in the ArrayList<>
                             manager.addPatient(patient);
                         
-                            System.out.println("Paciente registrado correctamente.");
-                        }
-                                                
-                        break;
+                            System.out.println("Paciente registrado correctamente.");                                                
+                            break;
                         
                     case 2:
-                        System.out.println("ID del medico");
-                        String dId = scanner.nextLine();
+                        String dId;
+                        while(true){
+                            System.out.println("ID del medico");
+                        dId = scanner.nextLine();
                         //Ensures the same ID does not exist twice
                         if(manager.findDoctorID(dId) != null){
                             System.out.println("Error, ya existe este ID");
-                        } else{
+                        } if(!Validations.validId(dId)){
+                            System.out.println("El ID debe contener solo numeros");
+                          }else{
+                            break;
+                           }
+                        }
+                            
+                        String dName;
+                        while(true){
                             System.out.println("Nombre del medico");
-                            String dName = scanner.nextLine();
+                            dName = scanner.nextLine();
+                            if(!Validations.validName(dName)){
+                                System.out.println("Nombre invalido. solo digite letras");
+                            }else{
+                                break;
+                            }
+                        }
                         
+                        int dAge;
+
+                        while(true){
+
                             System.out.println("Edad: ");
-                            int dAge = scanner.nextInt();
-                            scanner.nextLine();
+                            String inputAge = scanner.nextLine();
+
+                            try{
+                                dAge = Integer.parseInt(inputAge);
+
+                                if(!Validations.validAge(dAge)){
+                                    System.out.println("Edad invalida");
+                                }else{
+                                    break;
+                                }
+
+                            }catch(NumberFormatException e){
+                                System.out.println("Debe ingresar un numero");
+                            }
+                        } 
                         
                             //List of specialies
                             String[] dSpecialties = {
@@ -138,9 +214,8 @@ public class ClinicManagement {
                             manager.addDoctor(doctor);
                         
                             System.out.println("Medico registrado correctamente");
-                        }
                                                 
-                        break;
+                            break;
                         
                     case 3:
                         //If no patients or doctors are registered, an appointment cannot be scheduled
@@ -170,8 +245,18 @@ public class ClinicManagement {
                         int dIndex = scanner.nextInt();
                         scanner.nextLine();
                         
-                        System.out.println("Fecha de la cita (DIA/MES/AÑO): ");
-                        String date = scanner.nextLine();
+                        String date;
+                        while(true){
+                            System.out.println("Fecha de la cita (AÑO/MES/DIA): ");
+                            date = scanner.nextLine();
+                        
+                            if(!Validations.validDate(date)){
+                            System.out.println("Fecha inválida");
+                            } else{
+                                break;
+                            }
+                        }
+                        
                         
                         //Creates the appointment with the respective patient and doctor on the entered date
                         Appointment appointment = new Appointment(manager.getPatients().get(pIndex),
